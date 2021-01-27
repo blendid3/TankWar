@@ -17,8 +17,12 @@ public class GameClient extends JComponent {
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         frame.setTitle("The Tank Game");
-        frame.add(new GameClient());
+        frame.setIconImage(new ImageIcon("assets/images/icon.png").getImage());
+        GameClient client = new GameClient();
+//        client.repaint();
+        frame.add(client);
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
