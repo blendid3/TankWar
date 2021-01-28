@@ -10,7 +10,7 @@ import java.util.List;
 public class GameClient extends JComponent {
     private Tank playerTank;
     private List<Tank> enemyTanks = new ArrayList<>();
-
+    private List<Wall> wallList = new ArrayList<>();
     public GameClient() {
         playerTank = new MyTank(400, 100, Direction.DOWN);
         this.setPreferredSize(new Dimension(800, 600));
@@ -19,6 +19,10 @@ public class GameClient extends JComponent {
                 enemyTanks.add(new EnemyTank(300 + i * 100, 300 + j * 60, Direction.UP));
             }
         }
+        wallList.add(new Wall(200, 150, 12,true));
+        wallList.add(new Wall(200, 550, 12,true));
+        wallList.add(new Wall(100, 100, 12,false));
+        wallList.add(new Wall(600, 100, 12,false));
     }
 
     @Override
@@ -29,6 +33,11 @@ public class GameClient extends JComponent {
         for(int i = 0; i < this.enemyTanks.size(); i++) {
             this.enemyTanks.get(i).draw(g);
         }
+
+        for (int i = 0; i < wallList.size(); i++) {
+            this.wallList.get(i).draw(g);
+        }
+
     }
 
     public static void main(String[] args) {
