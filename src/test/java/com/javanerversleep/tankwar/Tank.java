@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-class Tank {
+public abstract class  Tank {
     private int x;
 
 
@@ -38,14 +38,21 @@ class Tank {
         return y;
     }
 
-    ImageIcon getImage() {
+    private ImageIcon getImage() {
         switch (direction) {
             case UP: return new ImageIcon("assets/images/tankU.gif");
             case DOWN: return new ImageIcon("assets/images/tankD.gif");
             case RIGHT: return new ImageIcon("assets/images/tankR.gif");
             case LEFT: return new ImageIcon("assets/images/tankL.gif");
+            case DOWNLEFT: return new ImageIcon("assets/images/tankLD.gif");
+            case DOWNRIGHT: return new ImageIcon("assets/images/tankRD.gif");
+            case UPLEFT: return new ImageIcon("assets/images/tankLU.gif");
+            case UPRIGHT: return new ImageIcon("assets/images/tankRU.gif");
+            default:
+//                throw new ClassNotFoundException("direction type doesn't find");
+                throw new IllegalStateException("Unexpected value: " + this.direction);
         }
-        return null;
+
     }
     private boolean up, left, right, down = false;
     private boolean stopSign = true;
@@ -70,9 +77,9 @@ class Tank {
         }
         this.stopSign = true;
     }
-    public void draw(Graphics g) { // run in every 50 mills
+    public void draw(Graphics g)  { // run in every 50 mills
         move();
-        g.drawImage(new ImageIcon("assets/images/tankD.gif").getImage(), this.getX(), this.getY(), null);
+        g.drawImage(this.getImage().getImage(), this.getX(), this.getY(), null);
     }
 
     private void move() {
