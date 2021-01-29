@@ -117,9 +117,15 @@ public abstract class  Tank {
                setX(oldX); setY(oldY);
            }
         }
+        for(Tank enemyTank: GameClient.getInstance().getEnemyTanks()) {
+            if(enemyTank.getRectangle().intersects(this.getRectangle())) {
+                setX(oldX); setY(oldY);
+            }
+        }
+
     }
     private Rectangle getRectangle() {
-        return new Rectangle(getX(), getY(), this.getImage().getImage().getWidth(null), this.getImage().getImage().getWidth(null));
+        return new Rectangle(getX(), getY(), (int)(this.getImage().getImage().getWidth(null) * 0.9), (int)(this.getImage().getImage().getHeight(null) * 0.9));
     }
 
     private void determineDirection() {

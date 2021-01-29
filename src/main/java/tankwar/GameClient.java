@@ -9,6 +9,11 @@ import java.util.List;
 
 public class GameClient extends JComponent {
     final private Tank playerTank;
+
+    public List<Tank> getEnemyTanks() {
+        return enemyTanks;
+    }
+
     final private List<Tank> enemyTanks = new ArrayList<>();
 
     public List<Wall> getWallList() {
