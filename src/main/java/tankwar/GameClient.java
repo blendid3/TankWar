@@ -1,4 +1,4 @@
-package com.javanerversleep.tankwar;
+package tankwar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,9 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameClient extends JComponent {
-    private Tank playerTank;
-    private List<Tank> enemyTanks = new ArrayList<>();
+    final private Tank playerTank;
+    final private List<Tank> enemyTanks = new ArrayList<>();
+
+    public List<Wall> getWallList() {
+        return wallList;
+    }
+
     private List<Wall> wallList = new ArrayList<>();
+    private static final GameClient INSTANCE = new GameClient();
+    public static GameClient getInstance() {
+        return INSTANCE;
+    }
+
     public GameClient() {
         playerTank = new MyTank(400, 100, Direction.DOWN);
         this.setPreferredSize(new Dimension(800, 600));
@@ -44,7 +54,7 @@ public class GameClient extends JComponent {
         JFrame frame = new JFrame();
         frame.setTitle("The Tank Game");
         frame.setIconImage(new ImageIcon("assets/images/icon.png").getImage());
-        GameClient client = new GameClient();
+        GameClient client =  GameClient.getInstance();
         frame.add(client);
         frame.pack();
         frame.setLocationRelativeTo(null);

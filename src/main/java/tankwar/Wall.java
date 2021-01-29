@@ -1,4 +1,4 @@
-package com.javanerversleep.tankwar;
+package tankwar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +8,7 @@ public class Wall {
     private int y ;
     private int brick_num = 7;
     private boolean horizontal = false ;
-
+    private static final Image brick =  new ImageIcon("assets/images/brick.png").getImage();
     public Wall(int x, int y, boolean horizontal) {
         this.x = x;
         this.y = y;
@@ -53,10 +53,16 @@ public class Wall {
         this.brick_num = brick_num;
         this.horizontal = horizontal;
     }
-
+    public Rectangle getRectangule() {
+        if(horizontal) {
+            return new Rectangle(getX(), getY(), brick.getWidth(null) * brick_num, brick.getHeight(null));
+        } else {
+            return new Rectangle(getX(), getY(), brick.getWidth(null) , brick.getHeight(null) * brick_num);
+        }
+    }
 
     public void draw(Graphics g) {
-        Image brick = new ImageIcon("assets/images/brick.png").getImage();
+//        Image brick = new ImageIcon("assets/images/brick.png").getImage();
         for(int i = 0; i < brick_num; i++) {
             if(horizontal){
                 g.drawImage(brick, this.getX() + i * brick.getWidth(null), this.getY(), null);

@@ -1,4 +1,6 @@
-package com.javanerversleep.tankwar;
+package tankwar;
+
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,7 +40,7 @@ public abstract class  Tank {
         return y;
     }
 
-    private ImageIcon getImage() {
+    ImageIcon getImage() {
         switch (direction) {
             case UP: return new ImageIcon("assets/images/tankU.gif");
             case DOWN: return new ImageIcon("assets/images/tankD.gif");
@@ -79,11 +81,18 @@ public abstract class  Tank {
     }
     public void draw(Graphics g)  { // run in every 50 mills
         move();
+
+        for(Wall wall : GameClient.getInstance().getWallList()) {
+//            this.getImage().getImage().
+        }
+
         g.drawImage(this.getImage().getImage(), this.getX(), this.getY(), null);
     }
 
     private void move() {
         if(stopSign) return;
+//        if(getX() <= 0 ||  )
+        int oldX = getX(); int oldY = getY();
         switch (this.direction) {
             case DOWN: setY(getY() + 5); break;
             case UP: setY(getY() - 5); break;
@@ -96,6 +105,21 @@ public abstract class  Tank {
             default:
                 throw new IllegalStateException("Unexpected value: " + this.direction);
         }
+        int img_width = this.getImage().getImage().getWidth(null); int img_height = this.getImage().getImage().getHeight(null);
+        if(getX() < 0 || getX() > GameClient.getInstance().getWidth() - img_width ) {
+            setX(oldX);
+        }
+        if(getY() < 0 || getY() > GameClient.getInstance().getHeight() - img_height ) {
+            setY(oldY);
+        }
+        for(Wall wall: GameClient.getInstance().getWallList()) {
+           if (getRectangle().intersects(wall.getRectangule())) {
+               setX(oldX); setY(oldY);
+           }
+        }
+    }
+    private Rectangle getRectangle() {
+        return new Rectangle(getX(), getY(), this.getImage().getImage().getWidth(null), this.getImage().getImage().getWidth(null));
     }
 
     private void determineDirection() {

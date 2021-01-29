@@ -1,4 +1,4 @@
-package com.javanerversleep.tankwar;
+package tankwar;
 
 public class MyTank extends Tank{
     public MyTank(int x, int y, Direction direction) {
