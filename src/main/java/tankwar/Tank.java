@@ -2,16 +2,39 @@ package tankwar;
 
 
 
+
+
+
+
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 public abstract class  Tank {
+
+    public static final int SPEED = 5;
     private int x;
 
-
-
     private int y;
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public boolean isIsalive() {
+        return isalive;
+    }
+
+    boolean isalive = true;
+
+    public void setIsalive(boolean isalive) {
+        this.isalive = isalive;
+    }
+
     private Direction direction = Direction.DOWN;
 
     public Tank(int x, int y, Direction direction) {
@@ -19,7 +42,6 @@ public abstract class  Tank {
         this.y = y;
         this.direction = direction;
     }
-
 
     public void setX(int x) {
         this.x = x;
@@ -40,23 +62,17 @@ public abstract class  Tank {
         return y;
     }
 
-    ImageIcon getImage() {
-        switch (direction) {
-            case UP: return new ImageIcon("assets/images/tankU.gif");
-            case DOWN: return new ImageIcon("assets/images/tankD.gif");
-            case RIGHT: return new ImageIcon("assets/images/tankR.gif");
-            case LEFT: return new ImageIcon("assets/images/tankL.gif");
-            case DOWNLEFT: return new ImageIcon("assets/images/tankLD.gif");
-            case DOWNRIGHT: return new ImageIcon("assets/images/tankRD.gif");
-            case UPLEFT: return new ImageIcon("assets/images/tankLU.gif");
-            case UPRIGHT: return new ImageIcon("assets/images/tankRU.gif");
-            default:
-//                throw new ClassNotFoundException("direction type doesn't find");
-                throw new IllegalStateException("Unexpected value: " + this.direction);
-        }
+    Image getImage() {
+        return direction.getImage();
 
     }
+
     private boolean up, left, right, down = false;
+
+    public boolean isStopSign() {
+        return stopSign;
+    }
+
     private boolean stopSign = true;
     public void keyPressed(KeyEvent e) { // run when press key in every thread;
         switch (e.getKeyCode()){
@@ -64,6 +80,7 @@ public abstract class  Tank {
             case KeyEvent.VK_DOWN: down = true; break;
             case KeyEvent.VK_LEFT: left = true; break;
             case KeyEvent.VK_RIGHT: right = true; break;
+            case KeyEvent.VK_SPACE: fire(); return;
         }
         stopSign = false;
         determineDirection();
@@ -79,64 +96,66 @@ public abstract class  Tank {
         }
         this.stopSign = true;
     }
-    public void draw(Graphics g)  { // run in every 50 mills
-        move();
-
-        for(Wall wall : GameClient.getInstance().getWallList()) {
-//            this.getImage().getImage().
-        }
-
-        g.drawImage(this.getImage().getImage(), this.getX(), this.getY(), null);
+    private void fire() {
+        Missile aMissile = new Missile(getX() + getImage().getWidth(null) / 2 - 6, getY() + getImage().getHeight(null) / 2 - 6, getDirection());
+        GameClient.getInstance().addMissiles(aMissile);
+        Media sound = new Media(new File("assets/audios/shoot.wav").toURI().toString());
+        MediaPlayer player = new MediaPlayer(sound);
+        player.play();
     }
 
-    private void move() {
-        if(stopSign) return;
-//        if(getX() <= 0 ||  )
+    public void draw(Graphics g)  { // run in every 50 mills
+        move();
+        g.drawImage(this.getImage(), this.getX(), this.getY(), null);
+    }
+
+    void move() {
+        if(isStopSign()) return;
+
         int oldX = getX(); int oldY = getY();
-        switch (this.direction) {
-            case DOWN: setY(getY() + 5); break;
-            case UP: setY(getY() - 5); break;
-            case LEFT: setX(getX() - 5); break;
-            case RIGHT: setX(getX() + 5); break;
-            case UPLEFT: setY(getY() - 5); setX(getX() - 5); break;
-            case UPRIGHT: setY(getY() - 5); setX(getX() + 5);break;
-            case DOWNLEFT: setY(getY() + 5); setX(getX() - 5); break;
-            case DOWNRIGHT: setY(getY() + 5); setX(getX() + 5);  break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + this.direction);
-        }
-        int img_width = this.getImage().getImage().getWidth(null); int img_height = this.getImage().getImage().getHeight(null);
+
+        setY(getY() + Tank.SPEED * direction.getY()); setX(getX() + Tank.SPEED * direction.getX());
+
+        int img_width = this.getImage().getWidth(null); int img_height = this.getImage().getHeight(null);
         if(getX() < 0 || getX() > GameClient.getInstance().getWidth() - img_width ) {
             setX(oldX);
         }
         if(getY() < 0 || getY() > GameClient.getInstance().getHeight() - img_height ) {
             setY(oldY);
         }
+
+        if(isCollision()) {
+            setX(oldX); setY(oldY);
+        }
+    }
+
+    private boolean isCollision() {
         for(Wall wall: GameClient.getInstance().getWallList()) {
            if (getRectangle().intersects(wall.getRectangule())) {
-               setX(oldX); setY(oldY);
+               return true;
            }
         }
         for(Tank enemyTank: GameClient.getInstance().getEnemyTanks()) {
             if(enemyTank.getRectangle().intersects(this.getRectangle())) {
-                setX(oldX); setY(oldY);
+                return true;
             }
         }
-
+        return false;
     }
-    private Rectangle getRectangle() {
-        return new Rectangle(getX(), getY(), (int)(this.getImage().getImage().getWidth(null) * 0.9), (int)(this.getImage().getImage().getHeight(null) * 0.9));
+
+    public Rectangle getRectangle() {
+        return new Rectangle(getX(), getY(), (int)(this.getImage().getWidth(null) * 0.9), (int)(this.getImage().getHeight(null) * 0.9));
     }
 
     private void determineDirection() {
-        if(up && left && !down && !right) this.direction = Direction.UPLEFT;
+        if(up && left && !down && !right) this.direction = Direction.UP_LEFT;
         if(up && !left && !down && !right) this.direction = Direction.UP;
         if(!up && left && !down && !right) this.direction = Direction.LEFT;
         if(!up && !left && down && !right) this.direction = Direction.DOWN;
         if(!up && !left && !down && right) this.direction = Direction.RIGHT;
-        if(up && !left && !down && right) this.direction = Direction.UPRIGHT;
-        if(!up && left && down && !right) this.direction = Direction.DOWNLEFT;
-        if(!up && !left && down && right) this.direction = Direction.DOWNRIGHT;
+        if(up && !left && !down && right) this.direction = Direction.UP_RIGHT;
+        if(!up && left && down && !right) this.direction = Direction.DOWN_LEFT;
+        if(!up && !left && down && right) this.direction = Direction.DOWN_RIGHT;
 
     }
 }

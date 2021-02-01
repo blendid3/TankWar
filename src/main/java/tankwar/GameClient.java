@@ -8,27 +8,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameClient extends JComponent {
+
     final private Tank playerTank;
-
-    public List<Tank> getEnemyTanks() {
-        return enemyTanks;
-    }
-
+    private static final GameClient INSTANCE = new GameClient();
     final private List<Tank> enemyTanks = new ArrayList<>();
+    private List<Missile> missilesList = new ArrayList<>();
+    private List<Wall> wallList = new ArrayList<>();
 
     public List<Wall> getWallList() {
         return wallList;
     }
+    public List<Tank> getEnemyTanks() {
+        return enemyTanks;
+    }
+    void addMissiles(Missile aMissile) {
+        missilesList.add(aMissile);
+    }
 
-    private List<Wall> wallList = new ArrayList<>();
-    private static final GameClient INSTANCE = new GameClient();
     public static GameClient getInstance() {
         return INSTANCE;
     }
 
     public GameClient() {
+        // our tank
         playerTank = new MyTank(400, 100, Direction.DOWN);
+
         this.setPreferredSize(new Dimension(800, 600));
+
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 4; j++) {
                 enemyTanks.add(new EnemyTank(300 + i * 100, 300 + j * 60, Direction.UP));
@@ -53,9 +59,16 @@ public class GameClient extends JComponent {
             this.wallList.get(i).draw(g);
         }
 
+        missilesList.removeIf(amissile -> !amissile.isIsalive());
+        for (int i = 0; i < missilesList.size(); i++) {
+            Missile themissile = missilesList.get(i);
+            themissile.draw(g);
+        }
+
     }
 
     public static void main(String[] args) {
+        com.sun.javafx.application.PlatformImpl.startup(() -> {});
         JFrame frame = new JFrame();
         frame.setTitle("The Tank Game");
         frame.setIconImage(new ImageIcon("assets/images/icon.png").getImage());
