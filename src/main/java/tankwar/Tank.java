@@ -163,8 +163,8 @@ class Tank {
             case KeyEvent.VK_DOWN: code |= Direction.DOWN.code; break;
             case KeyEvent.VK_LEFT: code |= Direction.LEFT.code; break;
             case KeyEvent.VK_RIGHT: code |= Direction.RIGHT.code; break;
-            case KeyEvent.VK_CONTROL: fire(); break;
-            case KeyEvent.VK_A: superFire(); break;
+            case KeyEvent.VK_SPACE: fire(); break;
+            case KeyEvent.VK_SHIFT: superFire(); break;
             case KeyEvent.VK_F2: GameClient.getInstance().restart(); break;
         }
         this.determineDirection();
