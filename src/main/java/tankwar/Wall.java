@@ -1,76 +1,45 @@
 package tankwar;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Rectangle;
 
-public class Wall {
+class Wall {
+
     private int x;
-    private int y ;
-    private int brick_num = 7;
-    private boolean horizontal = false ;
-    private static final Image brick =  new ImageIcon("assets/images/brick.png").getImage();
-    public Wall(int x, int y, boolean horizontal) {
+
+    private int y;
+
+    private boolean horizontal;
+
+    private int bricks;
+
+    private final Image brickImage;
+
+    Wall(int x, int y, boolean horizontal, int bricks) {
+        this.brickImage = Tools.getImage("brick.png");
         this.x = x;
         this.y = y;
         this.horizontal = horizontal;
+        this.bricks = bricks;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    Rectangle getRectangle() {
+        return horizontal ? new Rectangle(x, y,
+            bricks * brickImage.getWidth(null), brickImage.getHeight(null)) :
+            new Rectangle(x, y, brickImage.getWidth(null), brickImage.getHeight(null) * bricks);
     }
 
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public void setBrick_num(int brick_num) {
-        this.brick_num = brick_num;
-    }
-
-    public void setHorizontal(boolean horizontal) {
-        this.horizontal = horizontal;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getBrick_num() {
-        return brick_num;
-    }
-
-    public boolean isHorizontal() {
-        return horizontal;
-    }
-
-    public Wall(int x, int y, int brick_num, boolean horizontal) {
-        this.x = x;
-        this.y = y;
-        this.brick_num = brick_num;
-        this.horizontal = horizontal;
-    }
-    public Rectangle getRectangule() {
-        if(horizontal) {
-            return new Rectangle(getX(), getY(), brick.getWidth(null) * brick_num, brick.getHeight(null));
-        } else {
-            return new Rectangle(getX(), getY(), brick.getWidth(null) , brick.getHeight(null) * brick_num);
-        }
-    }
-
-    public void draw(Graphics g) {
-//        Image brick = new ImageIcon("assets/images/brick.png").getImage();
-        for(int i = 0; i < brick_num; i++) {
-            if(horizontal){
-                g.drawImage(brick, this.getX() + i * brick.getWidth(null), this.getY(), null);
-            } else {
-                g.drawImage(brick, this.getX() , this.getY() + i * brick.getHeight(null), null);
+    void draw(Graphics g) {
+        if (horizontal) {
+            for (int i = 0; i < bricks; i++) {
+                g.drawImage(brickImage, x + i * brickImage.getWidth(null), y, null);
             }
-
+        } else {
+            for (int i = 0; i < bricks; i++) {
+                g.drawImage(brickImage, x, y + i * brickImage.getHeight(null), null);
+            }
         }
-
     }
+
 }

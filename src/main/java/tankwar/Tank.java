@@ -1,161 +1,231 @@
 package tankwar;
 
+import tankwar.Save.Position;
 
-
-
-
-
-
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.io.File;
+import java.util.Random;
 
-public abstract class  Tank {
+class Tank {
 
-    public static final int SPEED = 5;
+    Position getPosition() {
+        return new Position(x, y, direction);
+    }
+
+    private static final int MOVE_SPEED = 5;
+
     private int x;
 
     private int y;
 
-    public Direction getDirection() {
-        return direction;
+    private boolean enemy;
+
+    private boolean live = true;
+
+    private static final int MAX_HP = 100;
+
+    private int hp = MAX_HP;
+
+    int getHp() {
+        return hp;
     }
 
-    public boolean isIsalive() {
-        return isalive;
+    void setHp(int hp) {
+        this.hp = hp;
     }
 
-    boolean isalive = true;
-
-    public void setIsalive(boolean isalive) {
-        this.isalive = isalive;
+    boolean isLive() {
+        return live;
     }
 
-    private Direction direction = Direction.DOWN;
+    void setLive(boolean live) {
+        this.live = live;
+    }
 
-    public Tank(int x, int y, Direction direction) {
+    boolean isEnemy() {
+        return enemy;
+    }
+
+    private Direction direction;
+
+    Tank(int x, int y, Direction direction) {
+        this(x, y, false, direction);
+    }
+
+    Tank(Position position, boolean enemy) {
+        this(position.getX(), position.getY(), enemy, position.getDirection());
+    }
+
+    Tank(int x, int y, boolean enemy, Direction direction) {
         this.x = x;
         this.y = y;
+        this.enemy = enemy;
         this.direction = direction;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
-    public int getX() {
-        return x;
-    }
-    public int getY() {
-        return y;
+    private void move() {
+        if (this.stopped) return;
+        x += direction.xFactor * MOVE_SPEED;
+        y += direction.yFactor * MOVE_SPEED;
     }
 
     Image getImage() {
-        return direction.getImage();
-
+        String prefix = enemy ? "e" : "";
+        return direction.getImage(prefix + "tank");
     }
 
-    private boolean up, left, right, down = false;
-
-    public boolean isStopSign() {
-        return stopSign;
+    boolean isDying() {
+        return this.hp <= MAX_HP * 0.2;
     }
 
-    private boolean stopSign = true;
-    public void keyPressed(KeyEvent e) { // run when press key in every thread;
-        switch (e.getKeyCode()){
-            case KeyEvent.VK_UP: up = true; break;
-            case KeyEvent.VK_DOWN: down = true; break;
-            case KeyEvent.VK_LEFT: left = true; break;
-            case KeyEvent.VK_RIGHT: right = true; break;
-            case KeyEvent.VK_SPACE: fire(); return;
-        }
-        stopSign = false;
-        determineDirection();
-    }
+    void draw(Graphics g) {
+        int oldX = x, oldY = y;
+        this.move();
 
-
-    public void keyReleased(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_UP: up = false; break;
-            case KeyEvent.VK_DOWN: down = false; break;
-            case KeyEvent.VK_LEFT: left = false; break;
-            case KeyEvent.VK_RIGHT: right = false; break;
-        }
-        this.stopSign = true;
-    }
-    private void fire() {
-        Missile aMissile = new Missile(getX() + getImage().getWidth(null) / 2 - 6, getY() + getImage().getHeight(null) / 2 - 6, getDirection());
-        GameClient.getInstance().addMissiles(aMissile);
-        Media sound = new Media(new File("assets/audios/shoot.wav").toURI().toString());
-        MediaPlayer player = new MediaPlayer(sound);
-        player.play();
-    }
-
-    public void draw(Graphics g)  { // run in every 50 mills
-        move();
-        g.drawImage(this.getImage(), this.getX(), this.getY(), null);
-    }
-
-    void move() {
-        if(isStopSign()) return;
-
-        int oldX = getX(); int oldY = getY();
-
-        setY(getY() + Tank.SPEED * direction.getY()); setX(getX() + Tank.SPEED * direction.getX());
-
-        int img_width = this.getImage().getWidth(null); int img_height = this.getImage().getHeight(null);
-        if(getX() < 0 || getX() > GameClient.getInstance().getWidth() - img_width ) {
-            setX(oldX);
-        }
-        if(getY() < 0 || getY() > GameClient.getInstance().getHeight() - img_height ) {
-            setY(oldY);
+        if (x < 0) {
+            x = 0;
+        } else if (x > GameClient.WIDTH - getImage().getWidth(null)) {
+            x = GameClient.WIDTH - getImage().getWidth(null);
         }
 
-        if(isCollision()) {
-            setX(oldX); setY(oldY);
+        if (y < 0) {
+            y = 0;
+        } else if (y > GameClient.HEIGHT - getImage().getHeight(null)) {
+            y = GameClient.HEIGHT - getImage().getHeight(null);
         }
-    }
 
-    private boolean isCollision() {
-        for(Wall wall: GameClient.getInstance().getWallList()) {
-           if (getRectangle().intersects(wall.getRectangule())) {
-               return true;
-           }
-        }
-        for(Tank enemyTank: GameClient.getInstance().getEnemyTanks()) {
-            if(enemyTank.getRectangle().intersects(this.getRectangle())) {
-                return true;
+        Rectangle rec = this.getRectangle();
+        for (Wall wall : GameClient.getInstance().getWalls()) {
+            if (rec.intersects(wall.getRectangle())) {
+                x = oldX;
+                y = oldY;
+                break;
             }
         }
-        return false;
+
+        for (Tank tank : GameClient.getInstance().getEnemyTanks()) {
+            if (tank != this && rec.intersects(tank.getRectangle())) {
+                x = oldX;
+                y = oldY;
+                break;
+            }
+        }
+
+        if (this.enemy && rec.intersects(GameClient.getInstance()
+            .getPlayerTank().getRectangle())) {
+            x = oldX;
+            y = oldY;
+        }
+
+        if (!enemy) {
+            Blood blood = GameClient.getInstance().getBlood();
+            if (blood.isLive() && rec.intersects(blood.getRectangle())) {
+                this.hp = MAX_HP;
+                Tools.playAudio("revive.wav");
+                blood.setLive(false);
+            }
+
+            g.setColor(Color.WHITE);
+            g.fillRect(x, y - 10, this.getImage().getWidth(null), 10);
+
+            g.setColor(Color.RED);
+            int width = hp * this.getImage().getWidth(null) / MAX_HP;
+            g.fillRect(x, y - 10, width, 10);
+
+            Image petImage = Tools.getImage("pet-camel.gif");
+            g.drawImage(petImage, this.x - petImage.getWidth(null) - DISTANCE_TO_PET, this.y, null);
+        }
+        g.drawImage(this.getImage(), this.x, this.y, null);
     }
 
-    public Rectangle getRectangle() {
-        return new Rectangle(getX(), getY(), (int)(this.getImage().getWidth(null) * 0.9), (int)(this.getImage().getHeight(null) * 0.9));
+    private static final int DISTANCE_TO_PET = 4;
+
+    Rectangle getRectangle() {
+        if (enemy) {
+            return new Rectangle(x, y, getImage().getWidth(null), getImage().getHeight(null));
+        } else {
+            Image petImage = Tools.getImage("pet-camel.gif");
+            int delta = petImage.getWidth(null) + DISTANCE_TO_PET;
+            return new Rectangle(x - delta, y, getImage().getWidth(null) + delta, getImage().getHeight(null));
+        }
     }
+
+    Rectangle getRectangleForHitDetection() {
+        return new Rectangle(x, y, getImage().getWidth(null), getImage().getHeight(null));
+    }
+
+    void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_UP: code |= Direction.UP.code; break;
+            case KeyEvent.VK_DOWN: code |= Direction.DOWN.code; break;
+            case KeyEvent.VK_LEFT: code |= Direction.LEFT.code; break;
+            case KeyEvent.VK_RIGHT: code |= Direction.RIGHT.code; break;
+            case KeyEvent.VK_CONTROL: fire(); break;
+            case KeyEvent.VK_A: superFire(); break;
+            case KeyEvent.VK_F2: GameClient.getInstance().restart(); break;
+        }
+        this.determineDirection();
+    }
+
+    private void fire() {
+        Missile missile = new Missile(x + getImage().getWidth(null) / 2 - 6,
+            y + getImage().getHeight(null) / 2 - 6, enemy, direction);
+        GameClient.getInstance().add(missile);
+
+        Tools.playAudio("shoot.wav");
+    }
+
+    private void superFire() {
+        for (Direction direction : Direction.values()) {
+            Missile missile = new Missile(x + getImage().getWidth(null) / 2 - 6,
+                y + getImage().getHeight(null) / 2 - 6, enemy, direction);
+            GameClient.getInstance().add(missile);
+        }
+
+        String audioFile = new Random().nextBoolean() ? "supershoot.aiff" : "supershoot.wav";
+        Tools.playAudio(audioFile);
+    }
+
+    private boolean stopped;
+
+    private int code;
 
     private void determineDirection() {
-        if(up && left && !down && !right) this.direction = Direction.UP_LEFT;
-        if(up && !left && !down && !right) this.direction = Direction.UP;
-        if(!up && left && !down && !right) this.direction = Direction.LEFT;
-        if(!up && !left && down && !right) this.direction = Direction.DOWN;
-        if(!up && !left && !down && right) this.direction = Direction.RIGHT;
-        if(up && !left && !down && right) this.direction = Direction.UP_RIGHT;
-        if(!up && left && down && !right) this.direction = Direction.DOWN_LEFT;
-        if(!up && !left && down && right) this.direction = Direction.DOWN_RIGHT;
+        Direction newDirection = Direction.get(code);
+        if (newDirection == null) {
+            this.stopped = true;
+        } else {
+            this.direction = newDirection;
+            this.stopped = false;
+        }
+    }
 
+    void keyReleased(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_UP: code ^= Direction.UP.code; break;
+            case KeyEvent.VK_DOWN: code ^= Direction.DOWN.code; break;
+            case KeyEvent.VK_LEFT: code ^= Direction.LEFT.code; break;
+            case KeyEvent.VK_RIGHT: code ^= Direction.RIGHT.code; break;
+        }
+        this.determineDirection();
+    }
+
+    private final Random random = new Random();
+
+    private int step = random.nextInt(12) + 3;
+
+    void actRandomly() {
+        Direction[] dirs = Direction.values();
+        if (step == 0) {
+            step = random.nextInt(12) + 3;
+            this.direction = dirs[random.nextInt(dirs.length)];
+            if (random.nextBoolean()) {
+                this.fire();
+            }
+        }
+        step--;
     }
 }
