@@ -85,18 +85,40 @@ class Tank {
         int oldX = x, oldY = y;
         this.move();
 
-        if (x < 0) {
-            x = 0;
-        } else if (x > GameClient.WIDTH - getImage().getWidth(null)) {
-            x = GameClient.WIDTH - getImage().getWidth(null);
+        limitTankWithScreen();
+
+        Rectangle rec = limitTankWithOtherTank(oldX, oldY);
+
+        if (!enemy) {
+            setHp(g, rec);
+
+            setCamel(g);
+        }
+        g.drawImage(this.getImage(), this.x, this.y, null);
+    }
+
+    private void setCamel(Graphics g) {
+        Image petImage = Tools.getImage("pet-camel.gif");
+        g.drawImage(petImage, this.x - petImage.getWidth(null) - DISTANCE_TO_PET, this.y, null);
+    }
+
+    private void setHp(Graphics g, Rectangle rec) {
+        Blood blood = GameClient.getInstance().getBlood();
+        if (blood.isLive() && rec.intersects(blood.getRectangle())) {
+            this.hp = MAX_HP;
+            Tools.playAudio("revive.wav");
+            blood.setLive(false);
         }
 
-        if (y < 0) {
-            y = 0;
-        } else if (y > GameClient.HEIGHT - getImage().getHeight(null)) {
-            y = GameClient.HEIGHT - getImage().getHeight(null);
-        }
+        g.setColor(Color.WHITE);
+        g.fillRect(x, y - 10, this.getImage().getWidth(null), 10);
 
+        g.setColor(Color.RED);
+        int width = hp * this.getImage().getWidth(null) / MAX_HP;
+        g.fillRect(x, y - 10, width, 10);
+    }
+
+    private Rectangle limitTankWithOtherTank(int oldX, int oldY) {
         Rectangle rec = this.getRectangle();
         for (Wall wall : GameClient.getInstance().getWalls()) {
             if (rec.intersects(wall.getRectangle())) {
@@ -119,26 +141,21 @@ class Tank {
             x = oldX;
             y = oldY;
         }
+        return rec;
+    }
 
-        if (!enemy) {
-            Blood blood = GameClient.getInstance().getBlood();
-            if (blood.isLive() && rec.intersects(blood.getRectangle())) {
-                this.hp = MAX_HP;
-                Tools.playAudio("revive.wav");
-                blood.setLive(false);
-            }
-
-            g.setColor(Color.WHITE);
-            g.fillRect(x, y - 10, this.getImage().getWidth(null), 10);
-
-            g.setColor(Color.RED);
-            int width = hp * this.getImage().getWidth(null) / MAX_HP;
-            g.fillRect(x, y - 10, width, 10);
-
-            Image petImage = Tools.getImage("pet-camel.gif");
-            g.drawImage(petImage, this.x - petImage.getWidth(null) - DISTANCE_TO_PET, this.y, null);
+    private void limitTankWithScreen() {
+        if (x < 0) {
+            x = 0;
+        } else if (x > GameClient.WIDTH - getImage().getWidth(null)) {
+            x = GameClient.WIDTH - getImage().getWidth(null);
         }
-        g.drawImage(this.getImage(), this.x, this.y, null);
+
+        if (y < 0) {
+            y = 0;
+        } else if (y > GameClient.HEIGHT - getImage().getHeight(null)) {
+            y = GameClient.HEIGHT - getImage().getHeight(null);
+        }
     }
 
     private static final int DISTANCE_TO_PET = 4;
