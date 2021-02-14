@@ -1,5 +1,7 @@
 # Tank War
-
+[![Build Status](https://travis-ci.com/blendid3/TankWar.svg?branch=master)](https://travis-ci.com/blendid3/TankWar)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/blendid3/TankWar/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/blendid3/TankWar/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/blendid3/TankWar/badges/build.png?b=master)](https://scrutinizer-ci.com/g/blendid3/TankWar/build-status/master)
 ![](assets/images/demo.jpg)
 
 This the small Project of Tank War using knowledge with J2EE, Java OOP, Java AWT, JavaFX, OOP, FAstJSON, JUnit, Maven.
