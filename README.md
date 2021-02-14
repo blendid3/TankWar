@@ -1,36 +1,19 @@
-## Mid-Term Project: Tank War
+# Tank War
 
 ![](assets/images/demo.jpg)
 
-You are required to implement a simple Tank War game using OOP concepts in Java programming
-language. Sounds exciting, right?
+This the small Project of Tank War using knowledge with J2EE, Java OOP, Java AWT, JavaFX, OOP, FAstJSON, JUnit, Maven.
+It implemented the basic function of Tank Game: Fire, Move in eight direction, Game savings, Blood showing, Game over and Restart, Home page, etc. 
 
-PS: I've published a course at [Udemy](https://www.udemy.com/java-tank-war/?couponCode=JAVA-NEVER-SLEEP), you may use
-coupon code `CSDNDEMO` to get the course for free if they are still available, or use coupon
-code `JAVA-NEVER-SLEEP` to get the course for **$9.99** only.
-
-[![](assets/images/udemy-course.jpg)](https://www.udemy.com/java-tank-war/?couponCode=JAVA-NEVER-SLEEP)
-
-It's taught in Chinese with step by step implementation instruction, which is very helpful for
-Java beginners. You may check the [curriculum](Outline.md) for more details.
 
 ### Development Environment
-It's recommended to use IDEA community edition as IDE. Using JDK8 to compile your code. You may
-fork this repository to your own and start your own solution. Since `Tools.java` uses javafx media
-to play audio file, if you are using JDK11 you need to add those jar files manually.
+
+It's recommended to use JDK8 or higher version to compiler the project. The recommandation IDE tools is Intellij IDEA. The project use Maven to build and manage the dependence. 
 
 ### Player Tank & Keyboard Control
-* There should be one and only one tank controlled by player using keyboard. You can use Up, Down,
-Left, Right to move the tank in eight directions, which means, you should include LeftUp, UpRight,
-RightDown, DownLeft also. Image files of the tank in eight directions will be provided under directory
-`assets/images/tank${direction}.gif`
-* When you press CTRL, your tank would fire a missile. Images of missile in eight directions are also
-provided as `assets/images/missile${direction}.gif`, direction of the missile should
-be same as that of Tank. Sound effect can be simulated using audio file `assets/audios/shoot.wav`
-* When you press A, you tank would trigger a SUPER-FIRE: fire to 8 directions at the same time!
-Sound effect can be simulated using either `assets/audios/supershoot.aiff` or `assets/audios/supershoot.wav` randomly
-* Player tank has a initial maximum HP of 100. Please draw a blood bar with tank in the upper
-to display player tank's health status
+
+We use UP, Down, Left, Right to control the direction moving and CTRL + SPACE and CTRL + SHIFT to fire and super fire.
+
 
 ### Enemy Tanks
 * There will be 12 enemy tanks in the beginning, the images are same with player tank,
@@ -111,31 +94,3 @@ or bad smells. Take care!
 * Read javadoc or browse the source code when you get stuck, ask help when you get stuck more than
 one hour, as this mid-term project is somewhat challenging for beginners
 
-### Honor Code & Advice
-* Make sure you are doing the work independently. Just Be Honest. It's acceptable that you cannot
-figure out how to finish this project, but it's TOTALLY UNACCEPTABLE that you did not do what you
-should do and what you can do
-* It's never allowed to copy&paste code either from web or other students' solution directly.
-If you are inspired please add them to your reference list
-* To make sure you fully understand what you are doing, in the presentation class, you will be
-asked to implement some minor adjustment feature within 10-20 minutes, or at least you should
-know where to change it. Those who failed to do this will be possibly treated as cheating
-* You will gain most benefit when you struggles with implementation, to improve your coding skills,
-you need to set up a challenging goal, and achieve it by all means.
-* Keep coding, keep coding, and keep coding
-
-### When You Get Depressed
-* This project would be challenging and difficult for many beginners, it will consume you tons of time,
-it will hurt your feelings, make you feel uncomfortable, be depressed and so on. Negative emotions
-will accumulate so that you would hate your instructor or even curse him - though he doesn't care
-* You may ask for counselling service from Church Pastor or an old, wise man
-* But still, you need to calm down and keep going, after many sleepless nights, after you conquered this
-little stupid game, you will be proud of what you have achieved and congratulations! You are in a higher
-level now, and there are many challenging problems waiting for you to resolve, and make a difference
-
-### Happy Coding!
-![](assets/images/happy-coding.jpg)
-
-## License
-
-See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
