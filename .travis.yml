@@ -1,9 +1,9 @@
 language: java
 sudo: false # faster builds
-jdk: oraclejdk8
-dist: trusty
+
+jdk:
+  - oraclejdk11
+  - oraclejdk14
 
 after_success:
-  - export CODECOV_TOKEN="80019e52-3dc5-4d1c-a5c0-a55350986b8b"
   - bash <(curl -s https://codecov.io/bash)
-  - codecov
